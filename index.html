@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .lists {
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="related-widget-wrapper">
+    <select id="id_user" name="user" required="">
+        <option value="" selected="selected">---------</option>
+        <option value="3">abc@hotmail.com</option>
+        <option value="1">admin</option>
+        <option value="2">et1103@hotmail.com</option>
+    </select>
+
+
+    <a class="related-widget-wrapper-link change-related" id="change_id_user" data-href-template="/admin/auth/user/__fk__/change/?_to_field=id&amp;_popup=1" title="Change selected user">
+        <img src="https://ouredu-dev.s3.amazonaws.com/static_dev/admin/img/icon-changelink.svg" alt="Change">
+    </a>
+
+
+    <a class="related-widget-wrapper-link add-related" id="add_id_user" href="/admin/auth/user/add/?_to_field=id&amp;_popup=1" title="Add another user">
+        <img src="https://ouredu-dev.s3.amazonaws.com/static_dev/admin/img/icon-addlink.svg" alt="Add">
+    </a>
+</div>
+
+
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+    <script>
+        $(function(){
+            var filterInput = '<input type="text" class="customFilter" placeholder="Filter" />';
+            var filterPopUp = '<div class="filterPop" style="border: 1px solid #000; min-height: 100px; min-width: 200px; display: none; position: fixed; left: 50%; top: 50%;"></div>';
+            $('#id_user').closest('.related-widget-wrapper').append(filterInput, filterPopUp);
+
+            $('.customFilter').on('keyup', function () {
+                $('.filterPop').empty();
+                var input = $(this).val();
+                $('.filterPop').show();
+                var newList = '';
+
+                $.each($('#id_user option'), function () {
+                    var index = $(this).val();
+                    var val = $(this).text();
+                    if(val.toLowerCase().indexOf(input) >= 0) {
+                        newList += '<p class="lists"><button class="filteredList" data-filteredID="' + index + '" value="' + val + '">' + val + "</button></p>";
+                    }
+                });
+
+                ($('.filterPop').append(newList));
+            });
+
+            $('body').on('click', '.filteredList', function () {
+                var id = $(this).data('filteredid');
+                $.each($('#id_user option'), function () {
+                  if($(this).val() == id){
+                      console.log($(this).text());
+                      $(this).siblings().removeAttr('selected');
+                      $(this).attr('selected', 'selected');
+                  }
+                });
+            });
+
+        });
+    </script>
+</body>
+</html>
