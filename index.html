@@ -9,6 +9,16 @@
             padding: 0;
             text-align: center;
         }
+
+        .filterPop {
+            background-color: #FCF;
+            min-height: 100px;
+            min-width: 200px;
+            display: none;
+            position: fixed;
+            left: 30%;
+            top: 30%;
+        }
     </style>
 </head>
 <body>
@@ -21,12 +31,14 @@
     </select>
 
 
-    <a class="related-widget-wrapper-link change-related" id="change_id_user" data-href-template="/admin/auth/user/__fk__/change/?_to_field=id&amp;_popup=1" title="Change selected user">
+    <a class="related-widget-wrapper-link change-related" id="change_id_user"
+       data-href-template="/admin/auth/user/__fk__/change/?_to_field=id&amp;_popup=1" title="Change selected user">
         <img src="https://ouredu-dev.s3.amazonaws.com/static_dev/admin/img/icon-changelink.svg" alt="Change">
     </a>
 
 
-    <a class="related-widget-wrapper-link add-related" id="add_id_user" href="/admin/auth/user/add/?_to_field=id&amp;_popup=1" title="Add another user">
+    <a class="related-widget-wrapper-link add-related" id="add_id_user"
+       href="/admin/auth/user/add/?_to_field=id&amp;_popup=1" title="Add another user">
         <img src="https://ouredu-dev.s3.amazonaws.com/static_dev/admin/img/icon-addlink.svg" alt="Add">
     </a>
 </div>
@@ -54,94 +66,98 @@
     </select>
 
 
-    <a class="related-widget-wrapper-link change-related" id="change_id_school" data-href-template="/admin/schools/school/__fk__/change/?_to_field=id&amp;_popup=1" title="Change selected school" href="/admin/schools/school/12/change/?_to_field=id&amp;_popup=1">
+    <a class="related-widget-wrapper-link change-related" id="change_id_school"
+       data-href-template="/admin/schools/school/__fk__/change/?_to_field=id&amp;_popup=1"
+       title="Change selected school" href="/admin/schools/school/12/change/?_to_field=id&amp;_popup=1">
         <img src="https://ouredu-dev.s3.amazonaws.com/static/admin/img/icon-changelink.svg" alt="Change">
     </a>
 
 
-    <a class="related-widget-wrapper-link add-related" id="add_id_school" href="/admin/schools/school/add/?_to_field=id&amp;_popup=1" title="Add another school">
+    <a class="related-widget-wrapper-link add-related" id="add_id_school"
+       href="/admin/schools/school/add/?_to_field=id&amp;_popup=1" title="Add another school">
         <img src="https://ouredu-dev.s3.amazonaws.com/static/admin/img/icon-addlink.svg" alt="Add">
     </a>
 
 
-
 </div>
 
-    <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
-    <script>
-        $(function(){
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"
+        integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+<script>
+    $(function () {
 
-            var filter = {
-                className: '',
-                optionElements: function () {
-                    return $('#' + this.className + ' option');
-                },
-                filterInput: function (className) {
-                    return '<input type="text" class="customFilter_' + className + '" placeholder="Filter" />';
-                },
-                pop: function () {
-                    return $('.filterPop.' + this.className);
-                },
-                filterPopUp: function (className) {
-                    return '<div class="'  + className +  ' filterPop" style="background-color: #FCF; min-height: 100px; min-width: 200px; display: none; position: fixed; left: 50%; top: 50%;"></div>';
-                },
-                appending: function (selector) {
-                    this.className = (selector.attr('id'));
-                    return selector.closest('.related-widget-wrapper').append(this.filterInput(this.className), this.filterPopUp(this.className));
-                },
-                renderList: function () {
-//                    var filterPop = $('.filterPop.' + this.className);
-                    var pop = this.pop();
-                    var optionElements = this.optionElements();
-                    var className = this.className;
+        var filter = {
+            className: '',
+            optionElements: function () {
+                return $('#' + this.className + ' option');
+            },
+            filterInput: function (className) {
+                return '<input type="text" class="customFilter_' + className + '" placeholder="Filter" />';
+            },
+            pop: function () {
+                return $('.filterPop.' + this.className);
+            },
+            filterPopUp: function (className) {
+                return '<div class="' + className + ' filterPop"></div>';
+            },
+            appending: function (selector) {
+                this.className = (selector.attr('id'));
+                return selector.closest('.related-widget-wrapper').append(this.filterInput(this.className), this.filterPopUp(this.className));
+            },
+            renderList: function () {
+                var pop = this.pop();
+                var optionElements = this.optionElements();
+                var className = this.className;
 
-                    $('.customFilter_' + className ).on('keyup', function () {
-                        pop.empty();
-                        pop.show();
+                $('.customFilter_' + className).on('keyup', function () {
+                    var input = $(this).val();
+                    var newList = '';
 
-                        var input = $(this).val();
-                        var newList = '';
+                    pop.empty().show();
 
-                        $.each(optionElements, function () {
-                            var index = $(this).val();
-                            var val = $(this).text();
-                            if (val.toLowerCase().indexOf(input) >= 0) {
-                                newList += '<p class="lists"><button class="filteredList_' + className + '" data-filteredID="' + index + '" value="' + val + '">' + val + '</button></p>';
-                            }
-                        });  // end each loop
+                    $.each(optionElements, function () {
+                        var index = $(this).val();
+                        var val = $(this).text();
 
-                       return pop.append(newList);
-                    }); // end keyup
-                },
-                intoDropdown: function(){
-                    var optionElements = this.optionElements();
-                    var pop = this.pop();
-                    var className = this.className;
-                    $('body').on('click', '.filteredList_' + className, function (e) {
-                        e.preventDefault();
-                        var id = $(this).data('filteredid');
-                        $.each(optionElements, function () {
-                            if ($(this).val() == id) {
-                                $(this).siblings().removeAttr('selected');
-                                $(this).attr('selected', 'selected');
-                                pop.hide();
-                                pop.empty();
-                            }
-                        });
+                        (input == '') ? pop.hide() : false;
+
+                        if (val.toLowerCase().indexOf(input) >= 0) {
+                            newList += '<p class="lists"><button class="filteredList_' + className + '" data-filteredID="' + index + '" value="' + val + '">' + val + '</button></p>';
+                        }
+                    });  // end each loop
+                    console.log(newList);
+                    return pop.append(newList);
+                }); // end keyup
+            },
+            intoDropdown: function () {
+                var optionElements = this.optionElements();
+                var pop = this.pop();
+                var className = this.className;
+                $('body').on('click', '.filteredList_' + className, function (e) {
+                    e.preventDefault();
+                    var id = $(this).data('filteredid');
+                    $.each(optionElements, function () {
+                        if ($(this).val() == id) {
+                            $(this).siblings().removeAttr('selected');
+                            $(this).attr('selected', 'selected');
+                            pop.hide();
+                            pop.empty();
+                        }
                     });
-                },
-                run: function (selector) {
-                    this.appending(selector);
-                    this.renderList();
-                    this.intoDropdown();
-                }
+                });
+            },
+            run: function (selector) {
+                this.appending(selector);
+                this.renderList();
+                this.intoDropdown();
+            }
 
-            };
+        };
 
-            filter.run($('#id_user'));
-            filter.run($('#id_school'));
+        filter.run($('#id_user'));
+        filter.run($('#id_school'));
 
-        });
-    </script>
+    });
+</script>
 </body>
 </html>
